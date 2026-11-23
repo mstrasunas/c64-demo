@@ -14,9 +14,9 @@ hits
  sta targetX
  lda diveY
  sta targetY
- lda #8
+ lda #16
  sta height
- lda #11
+ lda #8
  sta width
  bne .check
 .rank jsr homeXY
@@ -93,7 +93,7 @@ hits
  jmp loseLife
 .done rts
 explosion
- lda #14
+ lda #16
  sta blastTime
  ldx #4
  lda targetX
@@ -102,7 +102,7 @@ explosion
  sta $d009
  lda #7
  sta $d02b
- lda #71
+ lda #112
  sta screen+1020
  lda $d015
  ora #16
@@ -116,19 +116,11 @@ blastTick
  beq .off
  lda blastTime
  lsr
- lsr
- lsr
- tax
- lda blastTime
- cmp #5
- lda #73
- bcc +
+ sta tempByte
+ lda #119
  sec
- sbc #1
- cpx #0
- beq +
- sbc #1
-+ sta screen+1020
+ sbc tempByte
+ sta screen+1020
 .done rts
 .off lda $d015
  and #$ef
@@ -145,6 +137,9 @@ loseLife
  jsr deathSound
  lda #90
  sta immune
+ lda #0
+ sta velocity
+ sta fraction
  lda #74
  sta playerX
  jsr hud

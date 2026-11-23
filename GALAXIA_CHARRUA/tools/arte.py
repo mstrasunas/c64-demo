@@ -89,13 +89,65 @@ for phase in range(4):
                 if dx*dx+dy*dy<7 or (dx==0 or dy==0 or abs(dx)==abs(dy)) and max(abs(dx),abs(dy))<=3:c='3'
             flag[2+y+wave][x]=c
     for a in (0,12): sprites+=pack([''.join(r[a:a+12]) for r in flag])
-save('sprites.bin',sprites)
-# Dos caracteres multicolor de ancho y dos de alto por enemigo.
+# Seis poses por especie. El ala exterior recorre un arco mientras el núcleo
+# conserva su silueta; cada celda multicolor representa dos píxeles VIC.
+bodies = [
+    ['003300','032230','321123','221122','022220','003300'],
+    ['000300','003230','032123','321122','322223','023320','030030'],
+    ['030030','032230','321123','211112','322223','032230','030030']
+]
+def alien(kind, phase):
+    grid = [[0]*8 for _ in range(16)]
+    lift = (-2,-1,1,2,1,-1)[phase]
+    pulse = (0,0,0,0,1,1)[phase]
+    for y,row in enumerate(bodies[kind]):
+        for x,c in enumerate(row):
+            grid[y+4+pulse][x+1]=int(c)
+    for side in (0,1):
+        for k in range(3):
+            x=k if side==0 else 7-k
+            y=5+kind+lift*(2-k)//2+k
+            for dy in range(2+kind):
+                grid[y+dy][x]=3 if dy==0 else 1
+        grid[11+pulse][2+3*side]=2
+        grid[12+pulse][1+5*side]=1
+    return [''.join(map(str,r)) for r in grid]
+
 tiles=[]
-for a in craft:
-    for half in (0,1):
-        for col in (0,1):
-            for yy in range(8):
-                row=a[(half*8+yy)//2][2:10]
-                tiles.append(int(row[col*4:col*4+4],4))
+for phase in range(6):
+    for kind in range(3):
+        rows=alien(kind,phase)
+        for half in (0,8):
+            for col in (0,4):
+                tiles.extend(int(r[col:col+4],4) for r in rows[half:half+8])
 save('enemigos.bin',tiles)
+# Índices VIC 82..93: tres inclinaciones y cuatro fases de propulsión.
+for bank in (0,-1,1):
+    for f in range(4):
+        rows=[]
+        for y,r in enumerate(ship):
+            shift=bank if y<9 else 0
+            rows.append(('0'+r+'0')[1-shift:13-shift])
+        for y in range(4):
+            rows.append('000'+('3123'[y] if y<(2,4,3,1)[f] else '0')+'0000'+
+                        ('3213'[y] if y<(4,2,1,3)[f] else '0')+'000')
+        sprites+=pack(rows)
+# 94..111: alas animadas durante la picada, con el mismo tamaño que en formación.
+for kind in range(3):
+    for f in range(6):
+        sprites+=pack([r+'0000' for r in alien(kind,f)])
+# 112..119: núcleo incandescente, frente de onda y fragmentos.
+for f in range(8):
+    grid=[[0]*12 for _ in range(21)]
+    for y in range(21):
+        for x in range(12):
+            radius=math.hypot((x-5.5)*1.8,y-10)
+            if f<4 and radius < 3+f and radius>max(-1,2*f-2):
+                grid[y][x]=1 if f<2 else 2
+    for i in range(13):
+        a=i*2.4
+        d=(f+1)*(0.7+0.09*(i%6))
+        x=round(5.5+math.cos(a)*d/1.8); y=round(10+math.sin(a)*d)
+        if 0<=x<12 and 0<=y<21:grid[y][x]=(1,2,3)[(i+f//2)%3]
+    sprites+=pack([''.join(map(str,r)) for r in grid])
+save('sprites.bin',sprites)

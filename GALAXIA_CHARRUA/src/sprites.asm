@@ -30,13 +30,25 @@ shipDraw
  ldx #0
  lda playerX
  jsr position
- lda #224
+ lda fraction
+ and #4
+ beq +
+ inc $d000
++ lda #224
  sta $d001
  lda frame
  lsr
  lsr
- and #1
- ora #64
+ and #3
+ clc
+ adc #82
+ ldx velocity
+ beq +
+ adc #4
+ cpx #128
+ bcs +
+ adc #4
++
  sta screen+1016
  lda #3
  sta $d027

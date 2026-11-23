@@ -44,6 +44,8 @@ initVic
  rts
 title
  lda #0
+ sta noteTime
+ sta songPos
  sta mode
  lda #$18
  sta $d018
@@ -104,8 +106,9 @@ titleAnim
  lda frame
  lsr
  lsr
- and #1
- ora #64
+ and #3
+ clc
+ adc #82
  sta screen+1016
  lda frame
  lsr

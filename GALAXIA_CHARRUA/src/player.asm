@@ -43,18 +43,43 @@ playerTick
  dec immune
 + lda keys
  and #12
- cmp #4
- bne .right
- lda playerX
- beq .fire
- dec playerX
- bne .fire
-.right cmp #8
- bne .fire
- lda playerX
- cmp #148
- bcs .fire
- inc playerX
+ tax
+ lda desiredSpeed,x
+ cmp velocity
+ beq .integrate
+ sec
+ sbc velocity
+ bmi .brakeLeft
+ inc velocity
+ inc velocity
+ jmp .integrate
+.brakeLeft dec velocity
+ dec velocity
+.integrate lda velocity
+ clc
+ adc fraction
+ tax
+ and #7
+ sta fraction
+ txa
+ eor #$80
+ lsr
+ lsr
+ lsr
+ sec
+ sbc #16
+ clc
+ adc playerX
+ cmp #149
+ bcc .store
+ cmp #200
+ lda #148
+ bcc .edge
+ lda #0
+.edge ldx #0
+ stx fraction
+ stx velocity
+.store sta playerX
 .fire
  lda cool
  beq +

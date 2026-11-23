@@ -73,8 +73,33 @@ overTick
 irq
  lda #1
  sta $d019
+ lda irqStage
+ cmp #74
+ beq .band
+ cmp #169
+ beq .bottom
  inc frame
- pla
+ lda mode
+ beq .restore
+ lda #74
+ bne .schedule
+.band
+ lda mode
+ beq .nextFrame
+ lda fineX
+ ora #$18
+ sta $d016
+ lda #169
+ bne .schedule
+.bottom
+ lda mode
+ beq .nextFrame
+ lda #$18
+ sta $d016
+.nextFrame lda #250
+.schedule sta irqStage
+ sta $d012
+.restore pla
  tay
  pla
  tax

@@ -26,6 +26,8 @@ homeXY
  adc formation
  asl
  asl
+ clc
+ adc fineHalf
  sta targetX
  lda homeY,x
  sta targetY
@@ -87,26 +89,64 @@ paintAll
  bpl -
  rts
 swarmTick
- dec moveTimer
- bne .attacks
- lda marchDelay
- sta moveTimer
+ ; Acumulador fraccional: entre 1 y 1,75 píxeles por cuadro PAL.
+ lda marchPhase
+ clc
+ adc marchBoost
+ sta marchPhase
+ lda scrollX
+ bcc .one
+ clc
+ adc marchDir
+.one clc
+ adc marchDir
+.bounded cmp #64
+ bcc .low
+ lda #$ff
+ sta marchDir
+ lda #64
+.low cmp #9
+ bcs .phase
+ lda #1
+ sta marchDir
+ lda #8
+.phase sta scrollX
+ and #7
+ sta fineX
+ lsr
+ sta fineHalf
+ lda scrollX
+ lsr
+ lsr
+ lsr
+ cmp formation
+ beq .wings
+ pha
  ldx #23
 - jsr eraseSlot
  dex
  bpl -
- lda formation
- clc
- adc marchDir
+ pla
  sta formation
- cmp #1
- beq .reverse
- cmp #8
- bne .draw
-.reverse lda marchDir
- eor #$fe
- sta marchDir
-.draw jsr paintAll
+ jsr paintAll
+.wings lda frame
+ and #3
+ bne .attacks
+ inc animation
+ ldx animation
+ cpx #6
+ bcc +
+ ldx #0
+ stx animation
++ lda poseLo,x
+ sta ptr
+ lda poseHi,x
+ sta ptr+1
+ ldy #95
+- lda (ptr),y
+ sta chars+128*8,y
+ dey
+ bpl -
 .attacks
  lda diver
  cmp #$ff
@@ -226,10 +266,12 @@ drawDive
  lda tileID,x
  sec
  sbc #128
- lsr
+ sta tempByte
  lsr
  clc
- adc #66
+ adc tempByte
+ adc animation
+ adc #94
  sta screen+1018
  lda enemyColor,x
  and #7

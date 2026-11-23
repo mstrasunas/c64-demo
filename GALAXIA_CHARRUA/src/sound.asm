@@ -8,52 +8,48 @@ silence
  lda #15
  sta $d418
  rts
-; Dos voces en presentación: motivo de pulso y bajo triangular.
+ ; Voz 2 reservada al himno tanto en presentación como en partida.
 music
- lda frame
- and #7
- bne .leave
- lda songPos
- and #31
- tax
+ lda noteTime
+ beq .next
+ dec noteTime
+ lda noteTime
+ cmp #2
+ bne .done
  lda #$40
- sta $d404
- lda #$10
  sta $d40b
- lda #$09
- sta $d403
- lda #$06
- sta $d405
- lda #$59
- sta $d406
- lda #$16
- sta $d40c
- lda #$79
- sta $d40d
- lda melody,x
- beq .bass
+.done rts
+.next ldx songPos
+ cpx #anthemEnd-anthem
+ bcc +
+ ldx #0
++ lda anthem,x
  tay
- lda freqLo,y
- sta $d400
- lda freqHi,y
- sta $d401
- lda #$41
- sta $d404
-.bass txa
- lsr
- lsr
- tay
- ldx bass,y
- lda freqHi,x
- lsr
- sta $d408
- lda freqLo,x
- ror
+ lda anthem+1,x
+ sec
+ sbc #1
+ sta noteTime
+ inx
+ inx
+ stx songPos
+ lda #$40
+ sta $d40b
+ cpy #0
+ beq .done
+ lda anthemLo,y
  sta $d407
- lda #$11
+ lda anthemHi,y
+ sta $d408
+ lda #5
+ sta $d40a
+ lda #$18
+ sta $d40c
+ lda #$a7
+ sta $d40d
+ lda #$41
  sta $d40b
- inc songPos
-.leave rts
+ rts
+
 laser
  lda #$20
  sta $d404
@@ -77,6 +73,8 @@ killSound
 deathSound
  lda #52
 noise
+ ldx #0
+ stx diveTone
  sta noiseTime
  sta $d40f
  lda #$80
@@ -89,16 +87,19 @@ noise
  sta $d412
  rts
 diveSound
- lda #$10
- sta $d40b
+ lda noiseTime
+ beq +
+ rts
++ lda #$10
+ sta $d412
  lda #$06
- sta $d408
+ sta $d40f
  lda #$04
- sta $d40c
+ sta $d413
  lda #$39
- sta $d40d
+ sta $d414
  lda #$11
- sta $d40b
+ sta $d412
  lda #18
  sta diveTone
  rts
@@ -125,8 +126,8 @@ audioTick
  beq +
  dec diveTone
  lda diveTone
- sta $d408
+ sta $d40f
  bne +
  lda #$10
- sta $d40b
+ sta $d412
 + rts

@@ -16,6 +16,9 @@ newGame
  sta seed
  lda #15
  sta cool
+ lda #0
+ sta noteTime
+ sta songPos
  jsr silence
  jsr playVideo
  jsr nextFleet
@@ -29,6 +32,11 @@ nextFleet
  bpl -
  lda #24
  sta remaining
+ lda #32
+ sta scrollX
+ lda #0
+ sta fineX
+ sta fineHalf
  lda #4
  sta formation
  lda #$ff
@@ -43,11 +51,15 @@ nextFleet
  bcc +
  lda #13
 + sta difficulty
- lda #26
  sec
- sbc difficulty
- sta marchDelay
- sta moveTimer
+ sbc #1
+ asl
+ asl
+ asl
+ asl
+ sta marchBoost
+ lda #0
+ sta marchPhase
  lda difficulty
  asl
  asl
@@ -82,6 +94,7 @@ nextFleet
  sta screen+16*40+21
  rts
 gameTick
+ jsr music
  jsr stars
  jsr audioTick
  jsr blastTick
@@ -112,6 +125,8 @@ gameTick
  bpl -
 .done rts
 gameOver
+ lda #$40
+ sta $d40b
  lda #0
  sta idleLo
  lda #2

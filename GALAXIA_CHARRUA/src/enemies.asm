@@ -34,7 +34,11 @@ homeXY
  rts
 eraseSlot
  jsr cellAddress
- lda #32
+ lda (ptr),y
+ cmp tileID,x
+ beq +
+ rts
++ lda #32
  sta (ptr),y
  iny
  sta (ptr),y
@@ -83,12 +87,13 @@ paintSlot
  sta (colptr),y
 .skip rts
 paintAll
- ldx #23
+ ldx #0
 - jsr paintSlot
- dex
- bpl -
+ inx
+ cpx #24
+ bne -
  rts
-swarmTick
+advanceFormation
  ; Acumulador fraccional: entre 1 y 1,75 píxeles por cuadro PAL.
  lda marchPhase
  clc
@@ -115,6 +120,8 @@ swarmTick
  sta fineX
  lsr
  sta fineHalf
+ rts
+swarmTick
  lda scrollX
  lsr
  lsr

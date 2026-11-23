@@ -46,6 +46,8 @@ Cada oleada trae 24 enemigos. Un atacante que pasa de largo vuelve por arriba e 
 
 ## Animación y música
 
+Las estrellas descienden en dos planos de profundidad. Cruzan las filas de caracteres y reaparecen arriba al salir por abajo.
+
 La nave acelera y frena con precisión fraccional, se inclina al virar y alterna cuatro fases de propulsión. Los tres tipos de enemigo despliegan las alas en seis poses, tanto en formación como en picada. Las explosiones pasan del destello central a los fragmentos en ocho fases.
 
 En la presentación y en partida suena un arreglo instrumental del comienzo del coro del **Himno Nacional Uruguayo**, música de Francisco José Debali. La transcripción toma la entrada «Orientales, la patria o la tumba» de la partitura publicada por la Dirección General de Educación Inicial y Primaria. Una voz SID toca la melodía y las otras dos quedan disponibles para efectos. [Escuchar el arreglo SID](pruebas/himno-sid.mp3?raw=true) · [Partitura de referencia, página impresa 4](https://www.dgeip.edu.uy/documentos/2013/musica/biblioteca/HimnoNacionalb.pdf)
@@ -71,15 +73,15 @@ El script genera `GALAXIA_CHARRUA.PRG` junto al README. ACME incorpora directame
 | Archivo | Responsabilidad |
 |---|---|
 | main.asm | Arranque BASIC/6510, IRQ raster y ciclo de cuadros |
-| vic.asm, sprites.asm | Banco de video, presentación, estrellas y coordenadas de nueve bits |
+| vic.asm, sprites.asm | Banco de video, presentación y coordenadas de nueve bits |
 | player.asm | CIA1, teclado, movimiento y cadencia |
 | enemies.asm | Formación, picadas, retorno y fuego enemigo |
 | collisions.asm | Impactos, explosiones e invulnerabilidad |
 | game.asm | Partidas, oleadas, BCD y récord |
 | sound.asm | Secuenciador PAL y reparto de voces SID para música y efectos |
 | himno.asm | Notas y duraciones del comienzo del coro del himno |
-| data.asm, stars.asm | Tablas, estado y recursos VIC-II |
+| data.asm, stars.asm | Estado del juego y campo de estrellas con posiciones en píxeles |
 
 El VIC-II usa el banco $4000–$7FFF. La pantalla está en $4400, los punteros de sprites en $47F8, el juego de caracteres en $4800, los sprites en $5000 y el bitmap de presentación en $6000. El código empieza en $080D. El PRG ocupa 30.529 bytes, incluidos los espacios entre segmentos.
 
-La formación se dibuja con cuatro caracteres multicolor por enemigo. En partida se usan hasta cinco sprites simultáneos para nave, disparo propio, atacante, disparo enemigo y explosión. En partida, dos interrupciones en las líneas 74 y 169 aplican y retiran el desplazamiento horizontal fino de la banda enemiga. La misma posición alimenta las colisiones y el retorno de las picadas. El IRQ en la línea 250 avisa al bucle principal una vez por cuadro. El KERNAL salva los registros al entrar y el manejador los restaura antes de RTI. La lógica y el sonido corren en el 6510.
+La formación se dibuja con cuatro caracteres multicolor por enemigo. En partida se usan hasta cinco sprites simultáneos para nave, disparo propio, atacante, disparo enemigo y explosión. Dos interrupciones preparan el cambio de scroll con anticipación y sincronizan la escritura de $D016 con el inicio de las líneas 75 y 171. La misma posición alimenta las colisiones y el retorno de las picadas. El IRQ en la línea 250 avisa al bucle principal una vez por cuadro. El KERNAL salva los registros al entrar y el manejador los restaura antes de RTI. La lógica y el sonido corren en el 6510.

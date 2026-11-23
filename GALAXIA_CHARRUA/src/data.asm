@@ -8,7 +8,6 @@ homeY !byte 82,90,98,106,106,98,90,82,106,114,122,130,130,122,114,106,130,138,14
 tileID !for i,0,23 { !byte 128+i/8*4 }
 enemyColor !fill 8,15 : !fill 8,10 : !fill 8,13
 award !fill 8,$40 : !fill 8,$30 : !fill 8,$20
-starColors !byte 3,6,4,1
 labels !scr " score      hi-score    lives     wave  "
 overMsg !scr "game over"
 sectorMsg !scr "wave     "
@@ -26,7 +25,6 @@ mode !byte 0
 high !fill 3
 digitPos !byte 0
 savedX !byte 0
-starPhase !byte 0
 irqStage !byte 0
 noteTime !byte 0
 songPos !byte 0

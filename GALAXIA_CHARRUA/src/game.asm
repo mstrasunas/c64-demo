@@ -94,8 +94,10 @@ nextFleet
  sta screen+16*40+21
  rts
 gameTick
- jsr music
+ ; Componer el cielo antes de que el VIC lea las primeras filas visibles.
+ jsr advanceFormation
  jsr stars
+ jsr music
  jsr audioTick
  jsr blastTick
  jsr playerTick

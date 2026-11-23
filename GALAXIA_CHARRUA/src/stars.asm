@@ -1,3 +1,117 @@
-starCount=83
-starLo !byte 216,19,86,171,122,177,172,38,147,216,124,87,176,192,196,55,204,162,140,173,68,175,215,200,99,144,177,214,179,66,187,6,150,217,96,157,127,126,250,169,199,35,30,37,56,153,5,205,184,176,39,146,212,123,178,51,170,244,55,45,29,100,116,254,183,97,203,129,191,129,20,2,57,97,135,187,86,210,15,138,126,154,33
-starHi !byte 71,70,70,70,71,71,71,70,71,70,71,71,70,68,70,71,70,71,71,68,71,70,70,71,70,69,68,70,70,70,68,71,69,70,70,71,70,68,70,71,70,71,71,70,69,68,71,71,68,69,69,69,70,68,68,71,70,70,70,70,71,71,71,70,71,71,70,71,68,68,71,71,69,70,68,71,71,70,70,71,71,68,69
+!zone starfield
+; Un carácter por subposición (ocho filas por ocho columnas). Las estrellas
+; comparten glifos inmutables y avanzan entre celdas en coordenadas de píxel.
+starCount = 32
+skyHeight = 176
+starChar = 160
+starRowsLo !for i,0,skyHeight-1 { !byte <(screen+120+(i/8)*40) }
+starRowsHi !for i,0,skyHeight-1 { !byte >(screen+120+(i/8)*40) }
+starInitialY !byte 5,109,48,160,27,93,119,60,14,145,69,101,42,134,7,75,156,55,88,19,122,36,165,79,113,11,141,51,98,32,151,67
+; Separación mínima de ocho píxeles: dos estrellas nunca necesitan la misma celda.
+starCol !for i,0,starCount-1 { !byte (8+i*10+(i mod 2))/8 }
+starBit !for i,0,starCount-1 { !byte (8+i*10+(i mod 2)) & 7 }
+starColor !for i,0,7 { !byte 3,6,4,1 }
+starY !fill starCount
+oldRowLo !fill starCount
+oldRowHi !fill starCount
+oldCol !fill starCount
+
+initStars
+ ldx #0
+- lda skyGlyphs,x
+ sta chars+starChar*8,x
+ lda skyGlyphs+256,x
+ sta chars+starChar*8+256,x
+ inx
+ bne -
+ ldx #starCount-1
+- lda starInitialY,x
+ sta starY,x
+ lda #0
+ sta oldRowHi,x
+ dex
+ bpl -
+ rts
+
+stars
+ ldx #starCount-1
+.loop
+ ; Un enemigo o texto puede haberse dibujado encima desde el último cuadro.
+ lda oldRowHi,x
+ beq .advance
+ sta ptr+1
+ lda oldRowLo,x
+ sta ptr
+ ldy oldCol,x
+ lda (ptr),y
+ cmp #starChar
+ bcc .advance
+ cmp #starChar+64
+ bcs .advance
+ lda #32
+ sta (ptr),y
+.advance
+ ; Dos planos: un píxel por cuadro y un píxel cada dos cuadros.
+ txa
+ and frame
+ and #1
+ bne .place
+ inc starY,x
+ lda starY,x
+ cmp #skyHeight
+ bcc .place
+ lda #0
+ sta starY,x
+.place
+ ldy starY,x
+ lda starRowsLo,y
+ sta ptr
+ sta colptr
+ sta oldRowLo,x
+ lda starRowsHi,y
+ sta ptr+1
+ sta oldRowHi,x
+ clc
+ adc #$94
+ sta colptr+1
+ ; Compensar el scroll fino de la V sólo dentro de su banda de raster.
+ lda starBit,x
+ cpy #96
+ ldy starCol,x
+ bcs .pixel
+ sec
+ sbc fineX
+ bcs .pixel
+ dey
+.pixel and #7
+ sta tempByte
+ tya
+ sta oldCol,x
+ lda (ptr),y
+ cmp #32
+ bne .next
+ lda starY,x
+ and #7
+ asl
+ asl
+ asl
+ ora tempByte
+ clc
+ adc #starChar
+ sta (ptr),y
+ lda starColor,x
+ sta (colptr),y
+.next dex
+ bmi +
+ jmp .loop
++
+ rts
+
+skyGlyphs
+!for row,0,7 {
+ !for col,0,7 {
+  !for line,0,7 {
+   !if line=row { !byte 128 >> col } else { !byte 0 }
+  }
+ }
+}

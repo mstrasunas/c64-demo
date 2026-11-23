@@ -74,27 +74,33 @@ irq
  lda #1
  sta $d019
  lda irqStage
- cmp #74
+ cmp #72
  beq .band
- cmp #169
+ cmp #168
  beq .bottom
  inc frame
  lda mode
  beq .restore
- lda #74
+ lda #72
  bne .schedule
 .band
  lda mode
  beq .nextFrame
  lda fineX
  ora #$18
+ ldx #75
+- cpx $d012
+ bne -
  sta $d016
- lda #169
+ lda #168
  bne .schedule
 .bottom
  lda mode
  beq .nextFrame
  lda #$18
+ ldx #171
+- cpx $d012
+ bne -
  sta $d016
 .nextFrame lda #250
 .schedule sta irqStage

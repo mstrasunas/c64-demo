@@ -120,28 +120,61 @@ titleAnim
  sta $d000
  lda #1
  sta $d010
- ; Cuatro líneas de bitmap reservadas a las estrellas móviles.
+ ; Cada punto atraviesa los 320 píxeles de su línea de bitmap.
+ ldx #3
+.track
  lda frame
- and #3
- bne .done
- ldx starPhase
+ and titleRate,x
+ bne .nextTrack
+ jsr bandAddress
  lda #0
- jsr titleBands
- txa
- clc
- adc #8
- and #248
- tax
- stx starPhase
- lda #$44
- jsr titleBands
-.done rts
-titleBands
- sta bitmap+2*320+3,x
- sta bitmap+11*320+6+56,x
- sta bitmap+17*320+4,x
- sta bitmap+24*320+3+32,x
+ sta (ptr),y
+ inc bandBit,x
+ lda bandBit,x
+ cmp #8
+ bcc .drawTrack
+ lda #0
+ sta bandBit,x
+ inc bandColumn,x
+ lda bandColumn,x
+ cmp #40
+ bcc +
+ lda #0
+ sta bandColumn,x
++ jsr bandAddress
+.drawTrack ldy bandBit,x
+ lda dotBits,y
+ ldy #0
+ sta (ptr),y
+.nextTrack dex
+ bpl .track
  rts
+bandAddress
+ lda bandColumn,x
+ asl
+ asl
+ asl
+ pha
+ lda #0
+ rol
+ clc
+ adc bandBaseHi,x
+ sta ptr+1
+ pla
+ clc
+ adc bandBaseLo,x
+ sta ptr
+ bcc +
+ inc ptr+1
++ ldy #0
+ rts
+bandColumn !byte 1,10,21,33
+bandBit !byte 0,3,6,1
+dotBits !byte 128,64,32,16,8,4,2,1
+titleRate !byte 1,0,3,1
+bandBaseLo !byte <(bitmap+643),<(bitmap+3526),<(bitmap+5444),<(bitmap+7683)
+bandBaseHi !byte >(bitmap+643),>(bitmap+3526),>(bitmap+5444),>(bitmap+7683)
+
 titleScore
  ldx #0
 .loop
@@ -202,30 +235,7 @@ playVideo
  sta $d800+744,x
  inx
  bne -
- ldx #0
-- lda starLo,x
- sta ptr
- lda starHi,x
- sta ptr+1
- clc
- adc #$94
- sta colptr+1
- lda ptr
- sta colptr
- ldy #0
- txa
- and #3
- ora #144
- sta (ptr),y
- txa
- and #3
- tay
- lda starColors,y
- ldy #0
- sta (colptr),y
- inx
- cpx #starCount
- bne -
+ jsr initStars
  ldx #39
 - lda #148
  sta screen+80,x
@@ -241,29 +251,3 @@ playVideo
  lda #$ff
  sta chars+148*8+4
  rts
-stars
- lda frame
- and #3
- bne .skip
- lda frame
- lsr
- lsr
- and #7
- tax
- lda #0
- ldy #31
-- sta chars+144*8,y
- dey
- bpl -
- lda #8
- sta chars+144*8,x
- lda #$10
- sta chars+146*8,x
- txa
- eor #7
- tax
- lda #$40
- sta chars+145*8,x
- lda #2
- sta chars+147*8,x
-.skip rts

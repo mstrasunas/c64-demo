@@ -37,8 +37,11 @@ wave !byte 0
 playerX !byte 0
 immune !byte 0
 cool !byte 0
-shotX !byte 0
-shotY !byte 0
+shotSlot !byte 0
+shotX !fill 3
+shotY !fill 3
+rayX !byte 0
+rayBottom !byte 0
 alive !fill 24
 remaining !byte 0
 scrollX !byte 0
@@ -64,8 +67,6 @@ bombTimer !byte 0
 bombSpeed !byte 0
 targetX !byte 0
 targetY !byte 0
-height !byte 0
-width !byte 0
 victim !byte 0
 blastTime !byte 0
 seed !byte 0
@@ -82,7 +83,9 @@ runEnd
 stateEnd
 enemyTiles !binary "src/enemigos.bin"
 titleInk !binary "src/titulo.map"
-!if * > screen { !error "Código invade el banco de video" }
+!if * > $4000 { !error "Código invade el banco de video" }
+*=$4000
+!binary "src/viraje.bin"
 *=spriteMem
 !binary "src/sprites.bin"
 *=bitmap

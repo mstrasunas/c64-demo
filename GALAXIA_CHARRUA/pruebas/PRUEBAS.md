@@ -1,5 +1,13 @@
 # Verificación del juego y del campo de estrellas
 
+## Disparo triple y virajes
+
+La compilación probada con ACME 0.97 y x64sc PAL tiene el SHA-256 `9a9eca2fd052141c509a5fd042db28d0d4e789b2f42d129a14136a77eac1a885`. Con espacio sostenido se observaron los tres sprites de disparo activos a la vez, separados por 13 cuadros. Al liberarse un puesto, el siguiente tiro salió mientras los otros seguían en vuelo. En una prueba dirigida se colocaron los tres proyectiles sobre enemigos distintos en un mismo cuadro. El contador bajó en tres y los tres puestos quedaron libres. También se verificaron cambio de oleada, pérdida de vidas y reinicio.
+
+La captura muestra los cinco ángulos de la nave durante la aceleración, el frenado y la inversión de sentido. Se aplazó el ataque enemigo en esta toma para mostrar la nave sin el parpadeo de invulnerabilidad. [Ver la captura](rafaga.gif)
+
+## Pruebas de la versión anterior
+
 Se regeneraron los gráficos con Python y se ensambló el PRG con ACME 0.97. La segunda compilación reprodujo el SHA-256 `2599e84abe6cfc67890faf63f64153f7434eaadde8b25f936caff3bb7a277f89`. El ejecutable de 30.529 bytes se probó en VICE x64sc 3.9, con un C64 PAL y Xvfb. La prueba en hardware físico sigue pendiente.
 
 | Prueba | Método y resultado |

@@ -121,17 +121,39 @@ for phase in range(6):
             for col in (0,4):
                 tiles.extend(int(r[col:col+4],4) for r in rows[half:half+8])
 save('enemigos.bin',tiles)
-# Índices VIC 82..93: tres inclinaciones y cuatro fases de propulsión.
-for bank in (0,-1,1):
-    for f in range(4):
-        rows=[]
-        for y,r in enumerate(ship):
-            shift=bank if y<9 else 0
-            rows.append(('0'+r+'0')[1-shift:13-shift])
-        for y in range(4):
-            rows.append('000'+('3123'[y] if y<(2,4,3,1)[f] else '0')+'0000'+
-                        ('3213'[y] if y<(4,2,1,3)[f] else '0')+'000')
-        sprites+=pack(rows)
+# El fuselaje es una sola pieza. El ala lejana se acorta y levanta
+# durante el alabeo; ambos motores permanecen unidos al casco.
+def interceptor(bank, flame):
+    grid=[['0']*12 for _ in range(21)]
+    def paint(row, start, pixels):
+        grid[row][start:start+len(pixels)]=list(pixels)
+    for row,(start,pixels) in enumerate([
+        (5,'11'),(5,'12'),(5,'12'),(4,'3123'),(4,'1223'),
+        (4,'1332'),(4,'1332'),(4,'1322'),(4,'1223'),(4,'1223'),
+        (3,'312233'),(3,'212232'),(3,'212232'),(3,'212232'),
+        (3,'312213'),(3,'123321'),(3,'230032')]):
+        paint(row,start,pixels)
+    for side in (0,1):
+        extent=3-bank if side==0 else 3
+        for rib in range(extent+1):
+            x=3-rib if side==0 else 8+rib
+            top=9+rib-(bank if side==0 else 0)
+            for y in range(top,16):
+                grid[y][x]='1' if y==top else ('2' if y<14 else '3')
+    for x,length in [(3,(2,3,4,3)[flame]),(8,(4,3,2,3)[flame])]:
+        for i in range(length):grid[17+i][x]='1233'[i]
+    return [''.join(row) for row in grid]
+
+def flight_frames(bank):
+    result=[]
+    for flame in range(4):
+        rows=interceptor(abs(bank),flame)
+        if bank>0:rows=[r[::-1] for r in rows]
+        result+=pack(rows)
+    return result
+
+for bank in (0,-2,2):sprites+=flight_frames(bank)
+save('viraje.bin',flight_frames(-1)+flight_frames(1))
 # 94..111: alas animadas durante la picada, con el mismo tamaño que en formación.
 for kind in range(3):
     for f in range(6):

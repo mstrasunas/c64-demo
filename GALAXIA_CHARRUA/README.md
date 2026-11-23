@@ -5,7 +5,7 @@ Arcade espacial para Commodore 64 PAL. Mové la nave bajo la escuadrilla, abrí 
 [Descargar GALAXIA_CHARRUA.PRG](./GALAXIA_CHARRUA.PRG?raw=true) · [Pruebas de ejecución](pruebas/PRUEBAS.md)
 
 ![Pantalla de presentación del C64](pruebas/titulo.png)
-![Vuelo y combate en VICE PAL](pruebas/vuelo.gif)
+![Virajes y disparo triple en VICE PAL](pruebas/rafaga.gif)
 
 ## Jugar en VICE
 
@@ -21,7 +21,7 @@ x64sc -model c64 -pal -autostartprgmode 1 -autostart GALAXIA_CHARRUA.PRG
 | Mover la nave | Izquierda / derecha | A / D |
 | Disparar | FIRE | Espacio |
 
-Podés mantener el disparo pulsado. Sólo hay un proyectil propio en vuelo y deben pasar al menos 13 cuadros entre disparos. Para iniciar otra partida, soltá y volvé a pulsar FIRE o espacio. Si esperás unos diez segundos en GAME OVER, vuelve la presentación con el récord.
+Podés mantener el disparo pulsado. Podés tener hasta tres tiros en vuelo, con 13 cuadros entre disparos. Cada impacto o salida de pantalla libera un tiro. Para iniciar otra partida, soltá y volvé a pulsar FIRE o espacio. Si esperás unos diez segundos en GAME OVER, vuelve la presentación con el récord.
 
 ## Cargar en un C64
 
@@ -48,7 +48,7 @@ Cada oleada trae 24 enemigos. Un atacante que pasa de largo vuelve por arriba e 
 
 Las estrellas descienden en dos planos de profundidad. Cruzan las filas de caracteres y reaparecen arriba al salir por abajo.
 
-La nave acelera y frena con precisión fraccional, se inclina al virar y alterna cuatro fases de propulsión. Los tres tipos de enemigo despliegan las alas en seis poses, tanto en formación como en picada. Las explosiones pasan del destello central a los fragmentos en ocho fases.
+La nave acelera y frena con precisión fraccional, pasa por cinco inclinaciones al virar y alterna cuatro fases de propulsión. Los tres tipos de enemigo despliegan las alas en seis poses, tanto en formación como en picada. Las explosiones pasan del destello central a los fragmentos en ocho fases.
 
 En la presentación y en partida suena un arreglo instrumental del comienzo del coro del **Himno Nacional Uruguayo**, música de Francisco José Debali. La transcripción toma la entrada «Orientales, la patria o la tumba» de la partitura publicada por la Dirección General de Educación Inicial y Primaria. Una voz SID toca la melodía y las otras dos quedan disponibles para efectos. [Escuchar el arreglo SID](pruebas/himno-sid.mp3?raw=true) · [Partitura de referencia, página impresa 4](https://www.dgeip.edu.uy/documentos/2013/musica/biblioteca/HimnoNacionalb.pdf)
 
@@ -84,4 +84,4 @@ El script genera `GALAXIA_CHARRUA.PRG` junto al README. ACME incorpora directame
 
 El VIC-II usa el banco $4000–$7FFF. La pantalla está en $4400, los punteros de sprites en $47F8, el juego de caracteres en $4800, los sprites en $5000 y el bitmap de presentación en $6000. El código empieza en $080D. El PRG ocupa 30.529 bytes, incluidos los espacios entre segmentos.
 
-La formación se dibuja con cuatro caracteres multicolor por enemigo. En partida se usan hasta cinco sprites simultáneos para nave, disparo propio, atacante, disparo enemigo y explosión. Dos interrupciones preparan el cambio de scroll con anticipación y sincronizan la escritura de $D016 con el inicio de las líneas 75 y 171. La misma posición alimenta las colisiones y el retorno de las picadas. El IRQ en la línea 250 avisa al bucle principal una vez por cuadro. El KERNAL salva los registros al entrar y el manejador los restaura antes de RTI. La lógica y el sonido corren en el 6510.
+La formación se dibuja con cuatro caracteres multicolor por enemigo. En partida se usan hasta siete sprites simultáneos para nave, tres disparos propios, atacante, disparo enemigo y explosión. Dos interrupciones preparan el cambio de scroll con anticipación y sincronizan la escritura de $D016 con el inicio de las líneas 75 y 171. La misma posición alimenta las colisiones y el retorno de las picadas. El IRQ en la línea 250 avisa al bucle principal una vez por cuadro. El KERNAL salva los registros al entrar y el manejador los restaura antes de RTI. La lógica y el sonido corren en el 6510.

@@ -1,46 +1,47 @@
 !zone hits
 ; Coordenadas lógicas semi-X e Y de raster; bordes incluyen el largo del disparo.
 hits
- lda shotY
- bne +
- jmp .player
-+
+ ldy #2
+.ray sty shotSlot
+ lda shotY,y
+ beq .nextRay
+ clc
+ adc #4
+ sta rayBottom
+ lda shotX,y
+ sta rayX
  ldx #23
 .search lda alive,x
  beq .next
  cpx diver
- bne .rank
+ beq .diving
+ ; Descartar primero por fila sin calcular las 24 posiciones completas.
+ lda rayBottom
+ sec
+ sbc homeY,x
+ cmp #20
+ bcs .next
+ jsr homeXY
+ jmp .checkX
+.diving lda rayBottom
+ sec
+ sbc diveY
+ cmp #20
+ bcs .next
  lda diveX
  sta targetX
  lda diveY
  sta targetY
- lda #16
- sta height
- lda #8
- sta width
- bne .check
-.rank jsr homeXY
- lda #16
- sta height
- lda #8
- sta width
-.check lda shotX
+.checkX lda rayX
  sec
  sbc targetX
- cmp width
- bcs .next
- lda shotY
- clc
- adc #4
- sec
- sbc targetY
- cmp height
- bcc .hit
- sbc height
- cmp #4
+ cmp #8
  bcc .hit
 .next dex
  bpl .search
+.nextRay ldy shotSlot
+ dey
+ bpl .ray
  jmp .player
 .hit stx victim
  lda #0
@@ -58,6 +59,7 @@ hits
 + jsr eraseSlot
 .sound ldx victim
  jsr killSound
+ jmp .nextRay
 .player lda immune
  bne .done
  lda bombY

@@ -43,6 +43,8 @@ nextFleet
  sta diver
  lda #0
  sta shotY
+ sta shotY+1
+ sta shotY+2
  sta bombY
  sta blastTime
  sta $d015

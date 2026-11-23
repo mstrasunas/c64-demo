@@ -84,46 +84,63 @@ playerTick
  lda cool
  beq +
  dec cool
-+ lda shotY
- bne .move
- lda keys
++ lda keys
  and #16
- beq .end
+ beq .moveAll
  lda cool
- bne .end
- lda playerX
+ bne .moveAll
+ ldx #0
+.find lda shotY,x
+ beq .launch
+ inx
+ cpx #3
+ bne .find
+ beq .moveAll
+.launch lda playerX
  clc
  adc #5
- sta shotX
+ sta shotX,x
  lda #222
- sta shotY
+ sta shotY,x
  lda #13
  sta cool
  jsr laser
-.move
- lda shotY
+.moveAll ldx #2
+.move stx shotSlot
+ lda shotY,x
+ beq .next
  sec
  sbc #4
  cmp #60
- bcc dropShot
- sta shotY
- ldx #1
- lda shotX
+ bcs .draw
+ jsr dropShot
+ jmp .next
+.draw sta shotY,x
+ pha
+ lda shotX,x
+ ldy shotSlot
+ ldx shotSprite,y
  jsr position
- lda shotY
- sta $d003
+ pla
+ sta $d001,y
  lda #69
- sta screen+1017
+ sta screen+1016,x
  lda #3
- sta $d028
+ sta $d027,x
  lda $d015
- ora #2
+ ora bitMask,x
  sta $d015
-.end jmp shipDraw
+.next ldx shotSlot
+ dex
+ bpl .move
+ jmp shipDraw
 dropShot
+ ldx shotSlot
  lda #0
- sta shotY
+ sta shotY,x
+ ldy shotSprite,x
  lda $d015
- and #$fd
+ and clearBit,y
  sta $d015
  rts
+shotSprite !byte 1,5,6

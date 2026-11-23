@@ -36,19 +36,17 @@ shipDraw
  inc $d000
 + lda #224
  sta $d001
+ lda velocity
+ clc
+ adc #12
+ lsr
+ tax
  lda frame
  lsr
  lsr
  and #3
  clc
- adc #82
- ldx velocity
- beq +
- adc #4
- cpx #128
- bcs +
- adc #4
-+
+ adc bankFrame,x
  sta screen+1016
  lda #3
  sta $d027
@@ -64,3 +62,6 @@ shipDraw
  and #$fe
  sta $d015
  rts
+
+; Velocidad -12..12 en pasos de dos, con cinco poses de alabeo.
+bankFrame !byte 86,86,86,0,0,82,82,82,4,4,90,90,90

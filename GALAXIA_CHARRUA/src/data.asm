@@ -37,6 +37,13 @@ wave !byte 0
 playerX !byte 0
 immune !byte 0
 cool !byte 0
+doubleGun !byte 0
+flagX !byte 0
+flagY !byte 0
+killsToFlag !byte 0
+readyDelay !byte 0
+shotMask !fill 3
+beam !byte 0
 shotSlot !byte 0
 shotX !fill 3
 shotY !fill 3
@@ -88,5 +95,6 @@ titleInk !binary "src/titulo.map"
 !binary "src/viraje.bin"
 *=spriteMem
 !binary "src/sprites.bin"
+!if * > bitmap { !error "Sprites invaden el bitmap" }
 *=bitmap
 !binary "src/titulo.bin"

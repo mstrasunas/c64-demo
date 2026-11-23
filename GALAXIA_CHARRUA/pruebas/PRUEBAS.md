@@ -1,5 +1,17 @@
 # Verificación del juego y del campo de estrellas
 
+## Bandera, tiro doble y pausa entre vidas
+
+Se probó en x64sc 3.9 PAL el PRG con SHA-256 `855f5a003a7ff2441fdd9996deaee61c95bf886e13cb94f368acad684d07a523`.
+
+- Se dirigieron disparos con el monitor hacia cinco enemigos. El quinto soltó la bandera. Se colocó la nave debajo de su trayectoria y se observó la caída durante 204 cuadros hasta la recogida.
+- Manteniendo espacio, se observaron tres salvas dobles simultáneas. Se dirigió el rayo izquierdo de una salva a un enemigo y el derecho a otro. El segundo siguió en vuelo después del primer impacto.
+- Se provocó la pérdida de una nave manteniendo FIRE. La formación quedó inmóvil, se borraron los tiros, se perdió X2 y la protección de 90 cuadros permaneció íntegra durante la espera. Soltar y volver a pulsar reanudó la acción. Se comprobó la espera para la tercera vida y GAME OVER al agotarla.
+- En una prueba dirigida se eliminaron los 24 puestos y se verificó que X2 sobreviviera al cambio de oleada.
+- En una muestra de 72 cuadros con seis rayos activos, la actualización de la partida consumió entre 7.221 y 10.377 ciclos por cuadro. Un cuadro PAL dispone de 19.656 ciclos.
+
+[Bandera](bandera.png) · [Tres salvas dobles](doble.png) · [Pausa entre vidas](vida.png)
+
 ## Disparo triple y virajes
 
 La compilación probada con ACME 0.97 y x64sc PAL tiene el SHA-256 `9a9eca2fd052141c509a5fd042db28d0d4e789b2f42d129a14136a77eac1a885`. Con espacio sostenido se observaron los tres sprites de disparo activos a la vez, separados por 13 cuadros. Al liberarse un puesto, el siguiente tiro salió mientras los otros seguían en vuelo. En una prueba dirigida se colocaron los tres proyectiles sobre enemigos distintos en un mismo cuadro. El contador bajó en tres y los tres puestos quedaron libres. También se verificaron cambio de oleada, pérdida de vidas y reinicio.

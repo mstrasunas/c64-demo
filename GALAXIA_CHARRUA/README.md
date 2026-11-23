@@ -21,7 +21,7 @@ x64sc -model c64 -pal -autostartprgmode 1 -autostart GALAXIA_CHARRUA.PRG
 | Mover la nave | Izquierda / derecha | A / D |
 | Disparar | FIRE | Espacio |
 
-Podés mantener el disparo pulsado. Podés tener hasta tres tiros en vuelo, con 13 cuadros entre disparos. Cada impacto o salida de pantalla libera un tiro. Para iniciar otra partida, soltá y volvé a pulsar FIRE o espacio. Si esperás unos diez segundos en GAME OVER, vuelve la presentación con el récord.
+Podés mantener el disparo pulsado. Podés tener hasta tres tiros en vuelo, con 13 cuadros entre disparos. Una salva vuelve a estar disponible cuando sus proyectiles impactan o salen de pantalla. Para iniciar otra partida, soltá y volvé a pulsar FIRE o espacio. Si esperás unos diez segundos en GAME OVER, vuelve la presentación con el récord.
 
 ## Cargar en un C64
 
@@ -42,7 +42,7 @@ Si hay un solo juego con ese prefijo en el disco, también podés usar `LOAD"GAL
 | Medusa, fila roja | 30 | 60 |
 | Horqueta, fila verde | 20 | 40 |
 
-Cada oleada trae 24 enemigos. Un atacante que pasa de largo vuelve por arriba e intenta recuperar su puesto. Los proyectiles enemigos se desvían hacia el lado en que estaba la nave al disparar. Empezás con tres vidas. Después de un impacto, la nave reaparece en el centro y parpadea durante 90 cuadros. Los 24 enemigos vuelan en tres líneas en V. La marcha comienza a un píxel por cuadro y aumenta gradualmente hasta 1,75 píxeles por cuadro en la oleada 13. También se acorta el intervalo entre ataques. El récord dura mientras siga ejecutándose el programa.
+Cada oleada trae 24 enemigos. Un atacante que pasa de largo vuelve por arriba e intenta recuperar su puesto. Los proyectiles enemigos se desvían hacia el lado en que estaba la nave al disparar. Empezás con tres vidas. Al perder una nave, la acción se congela y se indica qué vida vas a jugar. Soltá y volvé a pulsar FIRE o espacio para continuar. La nave reaparece en el centro y parpadea durante 90 cuadros de protección. Los 24 enemigos vuelan en tres líneas en V. La marcha comienza a un píxel por cuadro y aumenta gradualmente hasta 1,75 píxeles por cuadro en la oleada 13. También se acorta el intervalo entre ataques. El récord dura mientras siga ejecutándose el programa.
 
 ## Animación y música
 
@@ -51,6 +51,12 @@ Las estrellas descienden en dos planos de profundidad. Cruzan las filas de carac
 La nave acelera y frena con precisión fraccional, pasa por cinco inclinaciones al virar y alterna cuatro fases de propulsión. Los tres tipos de enemigo despliegan las alas en seis poses, tanto en formación como en picada. Las explosiones pasan del destello central a los fragmentos en ocho fases.
 
 En la presentación y en partida suena un arreglo instrumental del comienzo del coro del **Himno Nacional Uruguayo**, música de Francisco José Debali. La transcripción toma la entrada «Orientales, la patria o la tumba» de la partitura publicada por la Dirección General de Educación Inicial y Primaria. Una voz SID toca la melodía y las otras dos quedan disponibles para efectos. [Escuchar el arreglo SID](pruebas/himno-sid.mp3?raw=true) · [Partitura de referencia, página impresa 4](https://www.dgeip.edu.uy/documentos/2013/musica/biblioteca/HimnoNacionalb.pdf)
+
+## Bandera y disparo doble
+
+Después de entre tres y seis bajas cae una bandera uruguaya desde el enemigo destruido. Alcanzala con la nave antes de que salga por abajo. El indicador **X2** confirma la mejora: cada disparo nuevo sale en dos rayos paralelos, uno por ala. Si uno impacta, el otro sigue su camino. Podés tener tres salvas dobles en vuelo.
+
+Conservás la mejora al cambiar de oleada y la perdés al perder la nave. Si dejás pasar la bandera, podés ganar otra con más bajas. [Bandera en vuelo](pruebas/bandera.png) · [Disparo doble](pruebas/doble.png) · [Aviso entre vidas](pruebas/vida.png)
 
 ## Compilar
 
@@ -75,6 +81,7 @@ El script genera `GALAXIA_CHARRUA.PRG` junto al README. ACME incorpora directame
 | main.asm | Arranque BASIC/6510, IRQ raster y ciclo de cuadros |
 | vic.asm, sprites.asm | Banco de video, presentación y coordenadas de nueve bits |
 | player.asm | CIA1, teclado, movimiento y cadencia |
+| bonus.asm | Aparición, vuelo y recogida de la bandera |
 | enemies.asm | Formación, picadas, retorno y fuego enemigo |
 | collisions.asm | Impactos, explosiones e invulnerabilidad |
 | game.asm | Partidas, oleadas, BCD y récord |
@@ -84,4 +91,4 @@ El script genera `GALAXIA_CHARRUA.PRG` junto al README. ACME incorpora directame
 
 El VIC-II usa el banco $4000–$7FFF. La pantalla está en $4400, los punteros de sprites en $47F8, el juego de caracteres en $4800, los sprites en $5000 y el bitmap de presentación en $6000. El código empieza en $080D. El PRG ocupa 30.529 bytes, incluidos los espacios entre segmentos.
 
-La formación se dibuja con cuatro caracteres multicolor por enemigo. En partida se usan hasta siete sprites simultáneos para nave, tres disparos propios, atacante, disparo enemigo y explosión. Dos interrupciones preparan el cambio de scroll con anticipación y sincronizan la escritura de $D016 con el inicio de las líneas 75 y 171. La misma posición alimenta las colisiones y el retorno de las picadas. El IRQ en la línea 250 avisa al bucle principal una vez por cuadro. El KERNAL salva los registros al entrar y el manejador los restaura antes de RTI. La lógica y el sonido corren en el 6510.
+La formación se dibuja con cuatro caracteres multicolor por enemigo. En partida se usan hasta ocho sprites simultáneos para nave, tres salvas propias, atacante, disparo enemigo, explosión y bandera. Dos interrupciones preparan el cambio de scroll con anticipación y sincronizan la escritura de $D016 con el inicio de las líneas 75 y 171. La misma posición alimenta las colisiones y el retorno de las picadas. El IRQ en la línea 250 avisa al bucle principal una vez por cuadro. El KERNAL salva los registros al entrar y el manejador los restaura antes de RTI. La lógica y el sonido corren en el 6510.

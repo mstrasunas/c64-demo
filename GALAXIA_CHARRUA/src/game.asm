@@ -20,6 +20,7 @@ newGame
  sta noteTime
  sta songPos
  jsr silence
+ jsr scheduleFlag
  jsr playVideo
  jsr nextFleet
  jmp hud
@@ -105,6 +106,7 @@ gameTick
  jsr playerTick
  jsr swarmTick
  jsr bombTick
+ jsr flagTick
  jsr hits
  lda mode
  cmp #1
@@ -246,3 +248,78 @@ hud
  sta screen+40,y
  iny
  rts
+
+!zone respawn
+lifeNotice
+ lda #3
+ sta mode
+ lda #1
+ sta latch
+ lda #40
+ sta readyDelay
+ lda #0
+ sta doubleGun
+ sta flagY
+ sta shotY
+ sta shotY+1
+ sta shotY+2
+ sta bombY
+ lda #32
+ sta screen+40+31
+ sta screen+40+32
+ lda #16
+ sta $d015
+ lda #$40
+ sta $d40b
+ jsr scheduleFlag
+ ldx diver
+ cpx #$ff
+ beq +
+ jsr endDive
+ jsr paintSlot
++ ldx #noticeWidth-1
+- lda lostText,x
+ sta screen+18*40+8,x
+ lda lifeText,x
+ sta screen+19*40+8,x
+ lda resumeText,x
+ sta screen+21*40+8,x
+ lda #7
+ sta $d800+18*40+8,x
+ lda #1
+ sta $d800+19*40+8,x
+ sta $d800+21*40+8,x
+ dex
+ bpl -
+ lda #52
+ sec
+ sbc lives
+ sta screen+19*40+8+10
+ rts
+lifeWait
+ jsr audioTick
+ jsr blastTick
+ jsr stars
+ lda readyDelay
+ beq .input
+ dec readyDelay
+ jsr trigger
+ rts
+.input jsr trigger
+ bcc .wait
+ ldx #noticeWidth-1
+ lda #32
+- sta screen+18*40+8,x
+ sta screen+19*40+8,x
+ sta screen+21*40+8,x
+ dex
+ bpl -
+ lda #1
+ sta mode
+ lda #13
+ sta cool
+.wait rts
+lostText !scr "      nave perdida      "
+lifeText !scr "     vida 0 de 3        "
+resumeText !scr "fire/espacio para seguir"
+noticeWidth=24

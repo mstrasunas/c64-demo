@@ -42,7 +42,11 @@ frameWait
  jsr controls
  lda mode
  beq titleTick
- cmp #2
+ cmp #3
+ bne +
+ jsr lifeWait
+ jmp frameWait
++ cmp #2
  beq overTick
  jsr gameTick
  jmp frameWait
@@ -134,4 +138,5 @@ trigger
 !source "src/collisions.asm"
 !source "src/game.asm"
 !source "src/sound.asm"
+!source "src/bonus.asm"
 !source "src/data.asm"

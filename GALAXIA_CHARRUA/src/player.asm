@@ -96,9 +96,20 @@ playerTick
  cpx #3
  bne .find
  beq .moveAll
-.launch lda playerX
+.launch lda #1
+ sta shotMask,x
+ lda doubleGun
+ beq .single
+ lda #3
+ sta shotMask,x
+ lda playerX
+ clc
+ adc #1
+ jmp .startShot
+.single lda playerX
  clc
  adc #5
+.startShot
  sta shotX,x
  lda #222
  sta shotY,x
@@ -123,7 +134,10 @@ playerTick
  jsr position
  pla
  sta $d001,y
- lda #69
+ ldy shotSlot
+ lda shotMask,y
+ tay
+ lda beamShape,y
  sta screen+1016,x
  lda #3
  sta $d027,x
@@ -143,4 +157,5 @@ dropShot
  and clearBit,y
  sta $d015
  rts
+beamShape !byte 69,69,122,123
 shotSprite !byte 1,5,6

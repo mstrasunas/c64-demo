@@ -177,3 +177,20 @@ for tail in (['200','002','200'], ['002','200','002']):
     dart=tail+['020','202','212','212','212','222','020','020']
     sprites+=pack([row+'0'*9 for row in dart])
 save('sprites.bin',sprites)
+
+# Un sprite por salva conserva los dos carriles aunque uno ya haya impactado.
+for beam in ('000000001000','100000001000'):
+    sprites+=pack([beam]*5)
+# Bandera de premio. 1 blanco, 2 amarillo individual y 3 celeste compartido.
+for phase in range(4):
+    grid=[['0']*12 for _ in range(21)]
+    for x in range(12):
+        wave=round(math.sin(x/3+phase*math.pi/2))
+        for y in range(18):
+            color='1' if y//2%2==0 else '3'
+            if x<6 and y<10:
+                color='1'
+                if (x,y) in [(2,1),(1,3),(3,3),(2,4),(1,5),(2,5),(3,5),(2,6),(1,7),(3,7),(2,8)]:color='2'
+            grid[1+y+wave][x]=color
+    sprites+=pack([''.join(row) for row in grid])
+save('sprites.bin',sprites)

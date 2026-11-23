@@ -4,50 +4,107 @@ hits
  ldy #2
 .ray sty shotSlot
  lda shotY,y
- beq .nextRay
- clc
+ bne +
+ jmp .nextRay
++ clc
  adc #4
  sta rayBottom
+ lda #1
+ sta beam
+.tryBeam lda beam
+ and shotMask,y
+ beq .nextBeam
  lda shotX,y
- sta rayX
- ldx #23
-.search lda alive,x
- beq .next
- cpx diver
- beq .diving
- ; Descartar primero por fila sin calcular las 24 posiciones completas.
- lda rayBottom
+ ldx beam
+ cpx #2
+ bne +
+ clc
+ adc #8
++ sta rayX
+ ; Un atacante libre puede cruzar cualquier carril.
+ ldx diver
+ cpx #$ff
+ beq .formation
  sec
- sbc homeY,x
- cmp #20
- bcs .next
- jsr homeXY
- jmp .checkX
-.diving lda rayBottom
+ sbc diveX
+ cmp #8
+ bcs .formation
+ lda rayBottom
  sec
  sbc diveY
  cmp #20
- bcs .next
+ bcs .formation
  lda diveX
  sta targetX
  lda diveY
  sta targetY
-.checkX lda rayX
+ jmp .hit
+.formation
+ ; En cada fila sólo una de las ocho columnas puede cortar este rayo.
+ lda scrollX
+ lsr
+ sta tempByte
+ lda rayX
  sec
- sbc targetX
+ sbc tempByte
+ cmp #128
+ bcs .nextBeam
+ tay
+ and #15
  cmp #8
- bcc .hit
-.next dex
- bpl .search
+ bcs .nextBeam
+ tya
+ lsr
+ lsr
+ lsr
+ lsr
+ ora #16
+ tax
+.row lda alive,x
+ beq .above
+ cpx diver
+ beq .above
+ lda rayBottom
+ sec
+ sbc homeY,x
+ cmp #20
+ bcs .above
+ jsr homeXY
+ jmp .hit
+.above txa
+ sec
+ sbc #8
+ tax
+ bpl .row
+.nextBeam ldy shotSlot
+ lda beam
+ cmp #2
+ beq .nextRay
+ asl
+ sta beam
+ jmp .tryBeam
 .nextRay ldy shotSlot
  dey
- bpl .ray
+ bmi +
+ jmp .ray
++
  jmp .player
 .hit stx victim
  lda #0
  sta alive,x
  dec remaining
- jsr dropShot
+ ldy shotSlot
+ lda shotMask,y
+ eor beam
+ sta shotMask,y
+ beq .spent
+ tax
+ lda beamShape,x
+ ldx shotSprite,y
+ sta screen+1016,x
+ jmp .burst
+.spent jsr dropShot
+.burst jsr flagDrop
  jsr explosion
  ldx victim
  jsr scoreKill
@@ -59,7 +116,7 @@ hits
 + jsr eraseSlot
 .sound ldx victim
  jsr killSound
- jmp .nextRay
+ jmp .nextBeam
 .player lda immune
  bne .done
  lda bombY
@@ -146,6 +203,6 @@ loseLife
  sta playerX
  jsr hud
  lda lives
- bne .done
- jmp gameOver
-.done rts
+ beq +
+ jmp lifeNotice
++ jmp gameOver

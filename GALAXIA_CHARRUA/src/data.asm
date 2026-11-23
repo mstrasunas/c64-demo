@@ -2,9 +2,9 @@
 desiredSpeed !byte 0,0,0,0,$f4,0,0,0,12,0,0,0,0
 bitMask !byte 1,2,4,8,16,32,64,128
 clearBit !byte 254,253,251,247,239,223,191,127
-rowLo !byte <(screen+160),<(screen+200),<(screen+240),<(screen+280),<(screen+280),<(screen+240),<(screen+200),<(screen+160),<(screen+280),<(screen+320),<(screen+360),<(screen+400),<(screen+400),<(screen+360),<(screen+320),<(screen+280),<(screen+400),<(screen+440),<(screen+480),<(screen+520),<(screen+520),<(screen+480),<(screen+440),<(screen+400)
-rowHi !byte >(screen+160),>(screen+200),>(screen+240),>(screen+280),>(screen+280),>(screen+240),>(screen+200),>(screen+160),>(screen+280),>(screen+320),>(screen+360),>(screen+400),>(screen+400),>(screen+360),>(screen+320),>(screen+280),>(screen+400),>(screen+440),>(screen+480),>(screen+520),>(screen+520),>(screen+480),>(screen+440),>(screen+400)
-homeY !byte 82,90,98,106,106,98,90,82,106,114,122,130,130,122,114,106,130,138,146,154,154,146,138,130
+rowLo !for slot,0,23 { +locateSlot slot : !byte <(screen+slotRow*40) }
+rowHi !for slot,0,23 { +locateSlot slot : !byte >(screen+slotRow*40) }
+homeY !for slot,0,23 { +locateSlot slot : !byte 50+slotRow*8 }
 tileID !for i,0,23 { !byte 128+i/8*4 }
 enemyColor !fill 8,15 : !fill 8,10 : !fill 8,13
 award !fill 8,$40 : !fill 8,$30 : !fill 8,$20

@@ -150,4 +150,8 @@ for f in range(8):
         x=round(5.5+math.cos(a)*d/1.8); y=round(10+math.sin(a)*d)
         if 0<=x<12 and 0<=y<21:grid[y][x]=(1,2,3)[(i+f//2)%3]
     sprites+=pack([''.join(map(str,r)) for r in grid])
+# Dardo de plasma: cola bifurcada, núcleo blanco y punta amarilla.
+for tail in (['200','002','200'], ['002','200','002']):
+    dart=tail+['020','202','212','212','212','222','020','020']
+    sprites+=pack([row+'0'*9 for row in dart])
 save('sprites.bin',sprites)

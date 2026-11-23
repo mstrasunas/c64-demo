@@ -1,4 +1,10 @@
 !zone swarm
+!macro locateSlot .slot {
+ !set wing = .slot & 7
+ !if wing > 3 { !set wing = 7-wing }
+ !set slotRow = 4+(.slot/8)*3+wing
+ !set slotAddr = screen+slotRow*40+(.slot & 7)*4
+}
 ; slot 0..23. La formación usa caracteres de 16x16. Un atacante pasa a sprite.
 cellAddress
  lda rowLo,x
@@ -120,25 +126,58 @@ advanceFormation
  sta fineX
  lsr
  sta fineHalf
- rts
-swarmTick
+ ; Completar el cambio de celda y la pose antes del trabajo del fondo.
  lda scrollX
  lsr
  lsr
  lsr
  cmp formation
- beq .wings
- pha
- ldx #23
-- jsr eraseSlot
+ bne +
+ jmp .wings
++ tay
+ ldx formation
+ sty formation
+ ; Limpiar sólo el borde que queda atrás. X e Y son columnas vieja y nueva.
+ bcc .leftEdge
  dex
- bpl -
- pla
- sta formation
- jsr paintAll
+.leftEdge
+ inx
+ !for slot,0,23 {
+   +locateSlot slot
+   lda slotAddr,x
+   cmp #128
+   bcc +
+   cmp #140
+   bcs +
+   lda #32
+   sta slotAddr,x
+   sta slotAddr+40,x
++
+ }
+ ; Columnas de destino conocidas en ensamblado. Evita calcular 24 punteros
+ ; durante el intervalo que precede al primer enemigo.
+ !for slot,0,23 {
+   +locateSlot slot
+   lda alive+slot
+   beq +
+   lda diver
+   cmp #slot
+   beq +
+   !for part,0,3 {
+     !set offset = (part/2)*40+(part & 1)
+     lda #128+slot/8*4+part
+     sta slotAddr+offset,y
+   }
+   lda enemyColor+slot
+   sta slotAddr+$9400,y
+   sta slotAddr+$9401,y
+   sta slotAddr+$9428,y
+   sta slotAddr+$9429,y
++
+ }
 .wings lda frame
  and #3
- bne .attacks
+ bne .formationDone
  inc animation
  ldx animation
  cpx #6
@@ -154,7 +193,8 @@ swarmTick
  sta chars+128*8,y
  dey
  bpl -
-.attacks
+.formationDone rts
+swarmTick
  lda diver
  cmp #$ff
  bne diveTick
@@ -352,10 +392,17 @@ bombTick
  lda bombX
  jsr position
  lda bombY
+ sec
+ sbc #6
  sta $d007
- lda #70
+ lda frame
+ lsr
+ lsr
+ and #1
+ clc
+ adc #120
  sta screen+1019
- lda #2
+ lda #7
  sta $d02a
  lda $d015
  ora #8

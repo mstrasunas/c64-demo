@@ -61,8 +61,10 @@ camera_update:
     ldy #0
 .second:
 !for r,4,24 {
+!if r<=19 | r=23 {
     lda world+r*160,x
     sta $4400+r*40,y
+}
 }
     inx
     iny
@@ -75,8 +77,10 @@ camera_update:
     ldy #0
 .copy:
 !for r,4,24 {
+!if r<=19 | r=23 {
     lda world+r*160,x
     sta $4000+r*40,y
+}
 }
     inx
     iny

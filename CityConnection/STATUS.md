@@ -29,3 +29,13 @@ Manhattan tiene 160 columnas y cuatro alturas. Las colisiones consultan coordena
 Una partida reproducible de 6.001 actualizaciones cubrió ambos sentidos, cambios consecutivos de dirección, saltos, los 552 segmentos y STAGE CLEAR. La prueba del binario en py65 cotejó las 840 celdas visibles con el mapa en cada actualización, la proyección del sprite en X=255/256 y el contador hasta completar y reiniciar con Fire.
 
 En VICE 3.9 x64sc PAL se arrancó el PRG mediante BASIC y se reprodujeron las mismas entradas sustituyendo la lectura de CIA por una rutina de prueba en RAM. Se registraron las escrituras de $D016 y se capturó el HUD durante desplazamiento y al completar. Las capturas y la secuencia de puerto 2 están en tests/. Queda pendiente la verificación física en un C64.
+
+## Etapa 4 · v04
+
+Dos patrullas aparecen fuera de la primera pantalla. Cada una persigue la X del jugador sobre su tramo y comprueba el apoyo antes de avanzar. El gato intenta aparecer cada 1.024 cuadros sobre carretera firme, separado del jugador, y se retira tras 128 cuadros. Hay tres latas de recogida única por partida. Fire dispara en el sentido de marcha; un impacto aturde durante 120 cuadros y embestir la patrulla giratoria otorga 100 puntos.
+
+Se usan ocho sprites físicos sin multiplexación. Las hitboxes usan X mundial de 16 bits e Y lógica. Un accidente consume una de tres vidas, dura 32 cuadros y va seguido de 100 cuadros de protección si quedan vidas. El accidente mantiene el mapa pintado. Fire reinicia después de STAGE CLEAR o GAME OVER.
+
+La secuencia reproducible de tests/combat.joy recoge aceite, dispara, elimina una patrulla, pierde una vida y completa los 552 segmentos. La prueba comprueba el contador y la matriz visible durante el recorrido. Pruebas dirigidas adicionales del binario en py65 comprueban el impacto con una patrulla activa, que el disparo atraviesa al gato, el daño del gato, la inmunidad, el agotamiento de vidas y los dos reinicios.
+
+En VICE 3.9 x64sc PAL se arrancó el PRG por BASIC y se sustituyó únicamente la lectura de CIA por la secuencia grabada. Se observaron 6.642 pasos por la separación raster en la línea 81, con un cuadro PAL por intervalo, y cero segmentos pendientes al final. Falta la comprobación en hardware físico.

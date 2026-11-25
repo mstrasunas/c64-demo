@@ -1,5 +1,7 @@
-# City Connection para Commodore 64 · Manhattan v03
+# City Connection para Commodore 64 · Manhattan v04
 
-Carga cityconnection_v03.prg y ejecuta RUN en un C64 PAL. Con el joystick del puerto 2, izquierda y derecha fijan el sentido de marcha y arriba salta. Suelta y vuelve a pulsar arriba para el siguiente salto.
+Carga cityconnection_v04.prg y ejecuta RUN en un C64 PAL. Usa el joystick del puerto 2. Izquierda y derecha eligen el sentido de marcha, arriba salta y Fire lanza una lata hacia delante. Suelta y vuelve a pulsar para repetir la acción.
 
-Recorre las cuatro alturas de Manhattan hasta pintar los 552 segmentos. La cámara sigue al automóvil entre los extremos de un escenario de cuatro pantallas. Al llegar a un extremo, selecciona el sentido contrario para regresar. Si caes por debajo del escenario, reapareces en la carretera inferior y conservas la pintura. Al alcanzar el 100 %, pulsa Fire para reiniciar. Los ejecutables anteriores se conservan junto a v03.
+Empiezas con tres vidas y cinco disparos. Recoge las latas de las carreteras para reponer aceite. Una patrulla alcanzada gira durante unos 2,4 segundos: embístela en ese intervalo para retirarla y ganar 100 puntos. Salta para evitar al gato, que resiste el aceite.
+
+Pinta los 552 segmentos de Manhattan. Después de un accidente reapareces en la carretera inferior, con dos segundos de protección y la pintura acumulada. Fire inicia otra partida en GAME OVER o STAGE CLEAR. Se conservan los PRG v01 a v03.

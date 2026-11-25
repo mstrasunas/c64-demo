@@ -11,6 +11,16 @@ road_tiles: !binary "build/road.bin"
 remaining: !word 0
 column: !byte 0
 stage_init:
+    ; Filas de fondo uniformes: se preparan una vez en las dos matrices.
+    ldy #39
+.blank:
+    lda #0
+!for r in [20,21,22,24] {
+    sta $4000+r*40,y
+    sta $4400+r*40,y
+}
+    dey
+    bpl .blank
     lda #0
     sta remaining
     sta remaining+1

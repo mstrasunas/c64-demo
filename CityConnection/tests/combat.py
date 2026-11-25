@@ -62,6 +62,7 @@ def set_actor(slot, x, y):
     ram[symbols['active']+slot] = 1
 
 for life in (2, 1, 0):
+    ram[symbols["active"]+3] = 0
     frame(255)
     set_actor(3, word(symbols['player_x']), ram[symbols['player_y']])
     ram[symbols['cat_clock']] = 2
@@ -79,3 +80,8 @@ assert ram[0x4451:0x445a] == list((root/'build/over.bin').read_bytes())
 frame(239)
 assert ram[symbols['lives']] == 3 and word(symbols['remaining']) == 552
 print('GAME OVER, inmunidad y reinicio verificados.')
+
+# Patrulla activa en el mismo tramo, sin disparo.
+set_actor(1, word(symbols['player_x']), ram[symbols['player_y']])
+frame(255)
+assert ram[symbols['lives']] == 2 and ram[symbols['crash']]

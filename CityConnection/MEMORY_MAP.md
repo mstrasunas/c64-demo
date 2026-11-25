@@ -30,3 +30,7 @@ v02 aloja el mapa lógico, su copia mutable y los contadores en la región del m
 El mundo usa $6000–$6F9F, 25 filas de 160 códigos de carácter, con las carreteras pintadas reflejadas en esa imagen. La plantilla y los 640 estados de colisión/pintura están en la región de código inferior a $3000. El contador pendiente tiene 16 bits. Las pantallas $4000 y $4400 comparten el charset $4800 y mantienen el puntero de sprite en $43F8/$47F8. El HUD siempre se lee de $4400. Color RAM se inicializa con el HUD y un color multicolor fijo para el campo.
 
 La X mundial del coche va de 8 a 1248 y la cámara de 0 a 960. El sprite recibe X mundial menos cámara más 24, incluido el noveno bit. En el campo se muestra la ventana de caracteres que comienza en ceil(cámara/8), con fase fina (-cámara) módulo 8.
+
+## v04 · actores
+
+Los sprites 0–7 se asignan permanentemente al jugador, dos patrullas, gato, proyectil y tres latas. El destello de accidente usa el propio sprite 0. Los cinco gráficos nuevos ocupan $5100–$523F. Las posiciones, temporizadores y hitboxes de los actores se procesan en el módulo actors.asm. La proyección escribe los punteros en ambas pantallas y combina sus bits altos de X en $D010.

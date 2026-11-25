@@ -85,6 +85,9 @@ for cy in range(25):
 
 screen = bytearray().join(world[r*160:r*160+40] for r in range(25))
 colors[160:] = bytes([15])*840
+# camera.asm omite estas filas constantes al desplazar una columna.
+for row in (20, 21, 22, 24):
+    assert world[row*160:(row+1)*160] == bytes(160)
 (out/"world.bin").write_bytes(world)
 
 def label(col, text, color):

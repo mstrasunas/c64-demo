@@ -1,6 +1,6 @@
 ; Mundo de una pantalla. Origen en la esquina superior izquierda del área
 ; visible. El VIC usa otro origen; solo render_player conoce esa diferencia.
-max_x = 320 - 24
+max_x = 1248
 car_ptr = ($5000 - $4000) / 64
 player_x: !word 40
 player_y: !byte 144
@@ -66,36 +66,37 @@ move_player:
     lda player_x
     cmp #<(max_x+1)
     bne .done
-    lda #0
-    sta player_x
-    sta player_x+1
+    dec player_x
 .done:
     rts
 .left:
-    lda player_x
-    bne .decrement
     lda player_x+1
-    beq .wrap
+    bne .decrease
+    lda player_x
+    cmp #8
+    beq .done
+.decrease:
+    lda player_x
+    bne +
     dec player_x+1
-.decrement:
-    dec player_x
-    rts
-.wrap:
-    lda #<max_x
-    sta player_x
-    lda #>max_x
-    sta player_x+1
++   dec player_x
     rts
 
 render_player:
-    ; Cámara fija en (0,0). El bit 8 incluye el acarreo del desplazamiento.
-    clc
+    sec
     lda player_x
+    sbc camera
+    tay
+    lda player_x+1
+    sbc camera+1
+    tax
+    tya
+    clc
     adc #24
     sta $d000
-    lda player_x+1
+    txa
     adc #0
-    sta $d010            ; Único sprite activo en esta etapa.
+    sta $d010
     clc
     lda player_y
     adc #50
@@ -108,5 +109,6 @@ render_player:
     ora facing
     clc
     adc #car_ptr
+    sta $43f8
     sta screen+$3f8
     rts

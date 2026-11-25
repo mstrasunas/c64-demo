@@ -2,7 +2,7 @@
 from pathlib import Path
 
 out = Path("build")
-pixels = [bytearray(160) for _ in range(200)]
+pixels = [bytearray(640) for _ in range(200)]
 colors = bytearray([11] * 1000)
 letters = {
     "P": [30,17,17,30,16,16,16], "T": [31,4,4,4,4,4,4],
@@ -18,7 +18,8 @@ def box(x, y, w, h, ink):
         row[x:x+w] = bytes([ink]) * w
 
 def tint(x, y, color):
-    colors[(y//8)*40 + x//4] = 8 + color
+    if x < 160:
+        colors[(y//8)*40 + x//4] = 8 + color
 
 # Cielo de medianoche con luna y estrellas fijas.
 for i in range(39):
@@ -45,6 +46,24 @@ for i,(x,w,top) in enumerate([(0,18,98),(21,14,86),(39,20,105),(62,16,74),
             lit = (xx//4 + y//8 + i)%4 != 0
             box(xx,y,2,3,3 if lit else 1)
             tint(xx,y,7 if i%3==0 else 3)
+# Manhattan escalonado y torres del puente sobre el East River.
+for x in range(160, 640, 16):
+    top = 80 + ((x//16)*17 % 48)
+    box(x, top, 14, 152-top, 1)
+    for y in range(top+4, 148, 8):
+        for wx in (2, 8):
+            box(x+wx, y, 2, 2, 3)
+for x in (220, 486):
+    for w, y in ((22,80),(14,64),(8,56),(2,42)):
+        box(x-w//2,y,w,148-y,2)
+for x in (332,396):
+    box(x,84,4,72,2)
+for x in range(316,416):
+    distance=min(abs(x-334),abs(x-398))
+    y=86+distance
+    box(x,y,1,1,3)
+    if x%4==0: box(x,y,1,132-y,1)
+box(316,132,100,3,2)
 box(0,24,160,1,3)
 for x in range(0,160,4):
     tint(x,24,3)
@@ -58,11 +77,15 @@ def tile(rows):
         glyphs.append(key)
     return indices[key]
 
-screen = bytearray()
+world = bytearray()
 for cy in range(25):
-    for cx in range(40):
-        screen.append(tile(sum(pixels[y][cx*4+i] << (6-2*i) for i in range(4))
+    for cx in range(160):
+        world.append(tile(sum(pixels[y][cx*4+i] << (6-2*i) for i in range(4))
                            for y in range(cy*8, cy*8+8)))
+
+screen = bytearray().join(world[r*160:r*160+40] for r in range(25))
+colors[160:] = bytes([15])*840
+(out/"world.bin").write_bytes(world)
 
 def label(col, text, color):
     for pos, ch in enumerate(text):
@@ -91,3 +114,8 @@ colors[112:116]=bytes([1])*4
 assert len(glyphs) <= 256 and len(colors) == len(screen) == 1000
 (out/"charset.bin").write_bytes(b"".join(glyphs).ljust(2048,b"\0"))
 (out/"scene.bin").write_bytes(screen+colors)
+
+layout=bytes(int(2<=c<=157 and not (8+l*4 <= c%40 <=10+l*4 or 30-l*3<=c%40<=31-l*3)) for l in range(4) for c in range(160))
+(out/"layout.bin").write_bytes(layout)
+total=sum(layout)
+(out/"percent.bin").write_bytes(bytes((total-r)*100//total for r in range(total+1)))

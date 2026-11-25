@@ -13,11 +13,14 @@ physics:
     tay
     lda player_x+1
     adc #0
+    sty column
     lsr
-    tya
-    ror
+    ror column
     lsr
+    ror column
     lsr
+    ror column
+    lda column
     sta column
     ldx grounded
     bmi .air

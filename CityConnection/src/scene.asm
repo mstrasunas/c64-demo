@@ -1,3 +1,4 @@
+!zone scene_copy
 ; 3 páginas y una cola solapada de 256 bytes. Solo se escriben 1000
 ; celdas, preservando los punteros de sprites al final de la matriz.
 draw_scene:

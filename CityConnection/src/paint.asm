@@ -4,14 +4,22 @@ paint_contact:
     cmp #1
     bne .done
     lda #2
-    sta road_state,y
-    stx saved_level
-    ldy column
-    lda #1
-    jsr draw_cell
-    dec remaining
+    sta ($fb),y
+    lda world_lo,x
+    sta $fb
+    lda world_hi,x
+    sta $fc
+    lda road_tiles+1
+    sta ($fb),y
+    stx dirty_level
+    sty dirty_column
+    lda remaining
+    bne +
+    dec remaining+1
++   dec remaining
     jsr progress
     lda remaining
+    ora remaining+1
     bne .done
     ldx #10
 .clear:
@@ -25,27 +33,14 @@ paint_contact:
     rts
 ; División por acumulación de restos. El acarreo conserva el noveno bit.
 progress:
-    lda total
-    sec
-    sbc remaining
-    sta painted_count
-    lda #0
-    ldx #100
-    ldy #0
-.loop:
+    lda #<percent_table
+    sta $fb
+    lda #>percent_table
     clc
-    adc painted_count
-    bcs .subtract
-    cmp total
-    bcc .carry_on
-.subtract:
-    sec
-    sbc total
-    iny
-.carry_on:
-    dex
-    bne .loop
-    tya
+    adc remaining+1
+    sta $fc
+    ldy remaining
+    lda ($fb),y
     ldy #0
     cmp #100
     bcc .tens
@@ -68,6 +63,6 @@ progress:
     lda digits,x
     sta screen+114
     rts
-painted_count: !byte 0
+percent_table: !binary "build/percent.bin"
 digits: !binary "build/digits.bin"
 clear_text: !binary "build/clear.bin"

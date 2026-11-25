@@ -33,9 +33,10 @@ collide:
 .safe:
     rts
 road_under:
-    lda column
-    clc
-    adc offsets,x
-    tay
-    lda road_state,y
+    lda state_lo,x
+    sta $fb
+    lda state_hi,x
+    sta $fc
+    ldy column
+    lda ($fb),y
     rts

@@ -1,0 +1,11 @@
+leadWave: .byte $11,$21,$17,$21,$15,$21,$17,$11
+leadAD: .byte $34,$15,$07,$15,$25,$06,$08,$38
+leadSR: .byte $a7,$b6,$97,$b6,$98,$c6,$a7,$89
+bassWave: .byte $40,$41,$41,$41,$41,$41
+drumAD: .byte $02,$04,$01
+drumSR: .byte $44,$64,$22
+kickHi: .byte 30,15,8,5,3,2
+kickWave: .byte $80,$81,$11,$11,$11,$10
+noiseHi: .byte $f0,$d8,$bd,$99,$88,$71
+noiseWave: .byte $80,$81,$81,$80,$80,$80
+arp: .byte 0,0,0,12,7,0

@@ -1,0 +1,10 @@
+break exec $1000
+g
+delete 1
+break exec $24a3
+g
+trace exec $24a3
+ignore 1 5dbf
+g
+r
+quit

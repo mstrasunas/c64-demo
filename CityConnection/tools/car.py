@@ -40,3 +40,18 @@ for left in (False, True):
         data.append(0)
 assert len(data) == 4*64
 Path("build/car.bin").write_bytes(data)
+
+# Patrulla con baliza, gato sentado, lata y destello del accidente.
+police = shape.copy()
+police[2] = "....wrc....."
+police[9] = "wwrrwwwwrwww"
+cat = ["............"]*6 + ["....r..r....","....rrrr....","....wrrw....",".....rr.....","....rrrr...r","....rrrr..rr","...rrrrrrrr.","...rwwrrww.."]
+can = ["............"]*7 + ["....wwww....","....wrrw....","....rccr....","....rccr....","....wrrw....","....wwww...."]
+burst = ["............","..r.....w...","...w.r.w....","r...wcw....r",".wwrcccrww..","..rccwccr...","...wcwcw....","..w.r.r.w...","....r...r..."]
+assets = bytearray()
+for rows in (police, [r[::-1] for r in police], cat, can, burst):
+    for row in rows + ["............"]*(21-len(rows)):
+        for x in (0,4,8):
+            assets.append(sum(inks.index(row[x+j]) << (6-2*j) for j in range(4)))
+    assets.append(0)
+Path("build/actors.bin").write_bytes(assets)

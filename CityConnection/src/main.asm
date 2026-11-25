@@ -15,6 +15,7 @@ start:
     jsr video_init
     jsr draw_scene
     jsr stage_init
+    jsr actors_init
     jsr camera_update
     jsr player_init
     lda #$1b
@@ -33,9 +34,16 @@ frame:
     jsr read_joystick
     lda #255
     sta dirty_level
+    lda crash
+    beq +
+    jsr crash_tick
+    jmp ready_view
++   lda lives
+    beq restart_check
     lda remaining
     ora remaining+1
     bne playing
+restart_check:
     lda pressed
     and #16
     beq display
@@ -44,16 +52,22 @@ frame:
     sta $d011
     jsr draw_scene
     jsr stage_init
+    jsr actors_init
     jmp ready_view
 playing:
     jsr move_player
     jsr physics
+    lda remaining
+    ora remaining+1
+    beq ready_view
+    jsr actors_tick
 ready_view:
     jsr camera_update
 display:
     jsr wait_frame
     jsr patch_paint
     jsr render_player
+    jsr render_actors
     lda #$12
     sta $d018
     lda #$18
@@ -61,6 +75,7 @@ display:
     lda #$1b
     sta $d011
     jmp frame
+!source "src/actors.asm"
 !source "src/camera.asm"
 !source "src/video.asm"
 !source "src/scene.asm"
@@ -77,5 +92,7 @@ scene_data: !binary "build/scene.bin"
 * = $5000
 car_sprites: !binary "build/car.bin"
 
+*=$5100
+!binary "build/actors.bin"
 *=$6000
 world: !binary "build/world.bin"

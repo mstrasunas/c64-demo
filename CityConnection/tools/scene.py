@@ -107,6 +107,8 @@ def codes(text):
     return bytes(tile([v << 2 for v in letters[ch]]+[0]) for ch in text)
 (out/"digits.bin").write_bytes(codes("0123456789"))
 (out/"clear.bin").write_bytes(codes("STAGE CLEAR"))
+letters.update({"M":[17,27,21,21,17,17,17],"O":[14,17,17,17,17,17,14]})
+(out/"over.bin").write_bytes(codes("GAME OVER"))
 screen[115]=codes("%")[0]
 colors[112:116]=bytes([1])*4
 (out/"road.bin").write_bytes(bytes([tile([255,170,85,0,0,0,0,0]),

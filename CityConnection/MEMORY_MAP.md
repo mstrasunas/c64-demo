@@ -1,4 +1,4 @@
-# Mapa de memoria · v01
+# Mapa de memoria · v02
 
 Direcciones inclusivas. El VIC-II usa el banco 1 ($4000–$7FFF), con $DD00 bits 1–0 = %10 y $D018 = $12.
 
@@ -23,3 +23,4 @@ Direcciones inclusivas. El VIC-II usa el banco 1 ($4000–$7FFF), con $DD00 bits
 | $E000–$FFFF | ROM KERNAL visible. |
 
 El PRG carga un bloque continuo desde $0801 hasta $50FF, con relleno entre segmentos. Durante el dibujo se copian 1000 celdas sin sobrescribir la tabla de punteros. La X lógica tiene 16 bits, con recorrido 0–296; la Y lógica se expresa en píxeles. La cámara queda fija en el origen y la proyección suma (24, 50) para el VIC-II. El bit alto de X va a $D010.
+v02 aloja el mapa lógico, su copia mutable y los contadores en la región del motor, por debajo de $3000. El dibujo de segmentos usa el puntero temporal $FB–$FC. La matriz de pantalla es una vista del mapa.

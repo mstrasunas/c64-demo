@@ -45,20 +45,9 @@ for i,(x,w,top) in enumerate([(0,18,98),(21,14,86),(39,20,105),(62,16,74),
             lit = (xx//4 + y//8 + i)%4 != 0
             box(xx,y,2,3,3 if lit else 1)
             tint(xx,y,7 if i%3==0 else 3)
-box(0,144,160,16,1)
-box(0,147,160,2,2)
-for x in range(0,160,8):
-    box(x,149,1,11,2)
-# Asfalto, marcas de carril y borde inferior.
-box(0,160,160,2,3)
-for x in range(0,160,16):
-    box(x,174,8,2,2)
-box(0,188,160,2,2)
-box(0,190,160,10,1)
-for y in (24, 160):
-    box(0,y,160,1,3)
-    for x in range(0,160,4):
-        tint(x,y,3 if y==24 else 1)
+box(0,24,160,1,3)
+for x in range(0,160,4):
+    tint(x,24,3)
 
 glyphs = []
 indices = {}
@@ -84,6 +73,21 @@ def label(col, text, color):
 for col, name, value in [(1,"PTS","000000"),(15,"VIDAS","03"),(26,"ACEITE","05")]:
     label(col,name,3)
     label(col+len(name)+1,value,1)
+letters.update({
+    "1":[4,12,4,4,4,4,14], "2":[14,17,1,2,4,8,31],
+    "4":[2,6,10,18,31,2,2], "6":[6,8,16,30,17,17,14],
+    "7":[31,1,2,4,8,8,8], "8":[14,17,17,14,17,17,14],
+    "9":[14,17,17,15,1,2,12], "%":[17,2,4,8,16,17,0],
+    "G":[14,17,16,23,17,17,14], "L":[16,16,16,16,16,16,31],
+    "R":[30,17,17,30,20,18,17], " ":[0]*7})
+def codes(text):
+    return bytes(tile([v << 2 for v in letters[ch]]+[0]) for ch in text)
+(out/"digits.bin").write_bytes(codes("0123456789"))
+(out/"clear.bin").write_bytes(codes("STAGE CLEAR"))
+screen[115]=codes("%")[0]
+colors[112:116]=bytes([1])*4
+(out/"road.bin").write_bytes(bytes([tile([255,170,85,0,0,0,0,0]),
+                                    tile([255,255,170,0,0,0,0,0])]))
 assert len(glyphs) <= 256 and len(colors) == len(screen) == 1000
 (out/"charset.bin").write_bytes(b"".join(glyphs).ljust(2048,b"\0"))
 (out/"scene.bin").write_bytes(screen+colors)

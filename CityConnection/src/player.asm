@@ -31,6 +31,12 @@ player_init:
 
 read_joystick:
     lda $dc00
+    tay
+    eor #$ff
+    and previous
+    sta pressed
+    sty previous
+    tya
     and #%00001100       ; Activo a cero. Otras entradas no alteran el rumbo.
     cmp #8
     beq .left

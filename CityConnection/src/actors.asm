@@ -7,6 +7,8 @@ crash: !byte 0
 shield: !byte 0
 clock4: !byte 0
 cat_clock: !byte 0
+cat_epoch: !byte 0
+shot_time: !byte 0
 shot_left: !byte 0
 active: !fill 8
 ax: !fill 8
@@ -30,6 +32,7 @@ actors_init:
     sta shield
     sta clock4
     sta cat_clock
+    sta cat_epoch
     sta score_hundreds
     sta stun+1
     sta stun+2
@@ -95,6 +98,10 @@ actors_tick:
     dec shield
 +   inc cat_clock
     bne .cat_age
+    inc cat_epoch
+    lda cat_epoch
+    and #3
+    bne .police
     lda #0
     sta active+3
     lda grounded
@@ -169,6 +176,8 @@ actors_tick:
     lda active+4
     bne .projectile
     inc active+4
+    lda #48
+    sta shot_time
     dec ammo
     jsr hud4
     lda player_x
@@ -182,6 +191,8 @@ actors_tick:
 .projectile:
     lda active+4
     beq .contacts
+    dec shot_time
+    beq .expire
     lda #4
     ldy #0
     ldx shot_left

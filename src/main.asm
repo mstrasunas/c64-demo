@@ -13,9 +13,16 @@ basic_end: !word 0
 start:
     sei                 ; Poseemos el raster y el teclado KERNAL queda inactivo.
     jsr video_init
+    jsr draw_scene
     lda #$1b
     sta $d011
 frame:
     jsr wait_frame
     jmp frame
 !source "src/video.asm"
+!source "src/scene.asm"
+!if * > $3000 { !error "Codigo fuera de su region" }
+* = $3000
+scene_data: !binary "build/scene.bin"
+* = $4800
+!binary "build/charset.bin"
